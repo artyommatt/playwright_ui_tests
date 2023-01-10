@@ -4,8 +4,8 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-pytest = "==7.2.0"
-playwright = "==1.29.1"
+greenlet = "==1.1.2"
+playwright = "==1.21.0"
 
 [dev-packages]
 
