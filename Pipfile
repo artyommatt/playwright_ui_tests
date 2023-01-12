@@ -10,6 +10,7 @@ playwright = "==1.21.0"
 [dev-packages]
 flake8-annotations = "==2.9.1"
 mypy = "==0.991"
+pre-commit = "*"
 
 [requires]
 python_version = "3.10"
