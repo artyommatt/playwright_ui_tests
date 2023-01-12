@@ -8,6 +8,11 @@ greenlet = "==1.1.2"
 playwright = "==1.21.0"
 
 [dev-packages]
+flake8-annotations = "==2.9.1"
+mypy = "==0.991"
 
 [requires]
 python_version = "3.10"
+
+[scripts]
+lint = "python -m run_lints"
