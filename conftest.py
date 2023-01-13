@@ -14,6 +14,15 @@ def get_playwright() -> Generator[Playwright, None, None]:
 
 @fixture
 def desktop_app(get_playwright: Playwright) -> Generator[App, None, None]:
-    app = App(get_playwright)
+    app = App(get_playwright, base_url="http://127.0.0.1:8000")
+    app.goto('/')
     yield app
     app.close()
+
+
+@fixture
+def desktop_app_auth(desktop_app: App) -> Generator[App, None, None]:
+    app = desktop_app
+    app.goto("/login")
+    app.login("alice", "Qamania123")
+    yield app

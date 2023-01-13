@@ -1,32 +1,28 @@
 from playwright.sync_api import Playwright
+from .test_cases import TestCases
 
 
 class App:
-    def __init__(self, playwright: Playwright) -> None:
-        self.browser = playwright.chromium.launch(headless=False)
+    def __init__(self, playwright: Playwright, base_url: str, headless: bool = False) -> None:
+        self.browser = playwright.chromium.launch(headless=headless)
         self.context = self.browser.new_context()
         self.page = self.context.new_page()
-        self.page.goto("http://127.0.0.1:8000/login/?next=/")
+        self.base_url = base_url
+        self.test_cases = TestCases(self.page)
 
-    def login(self) -> None:
-        self.page.fill("input[name=\"username\"]", "alice")
-        self.page.fill("input[name=\"password\"]", "Qamania123")
+    def goto(self, endpoint: str, use_base_url: bool = True) -> None:
+        if use_base_url:
+            self.page.goto(self.base_url + endpoint)
+        else:
+            self.page.goto(endpoint)
+
+    def navigate_to(self, menu: str) -> None:
+        self.page.click(f"css=header >> text=\"{menu}\"")
+
+    def login(self, login: str, password: str) -> None:
+        self.page.fill("input[name=\"username\"]", login)
+        self.page.fill("input[name=\"password\"]", password)
         self.page.press("input[name=\"password\"]", "Enter")
-
-    def create_test(self) -> None:
-        self.page.locator("text=Create new test").click()
-        self.page.locator("input[name=\"name\"]").fill("hello")
-        self.page.locator("textarea[name=\"description\"]").fill("world")
-        self.page.locator("input:has-text(\"Create\")").click()
-
-    def open_test_cases(self) -> None:
-        self.page.locator("text=Test Cases").click()
-
-    def check_test_created(self) -> None:
-        return self.page.query_selector('//td[text()="hello"]') is not None
-
-    def delete_test(self) -> None:
-        self.page.locator("text=hello world alice Norun None PASS FAIL Details Delete >> button").nth(3).click()
 
     def close(self) -> None:
         self.page.close()
