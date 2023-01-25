@@ -1,11 +1,13 @@
 from playwright.sync_api import Playwright
+
 from .test_cases import TestCases
 
 
 class App:
-    def __init__(self, playwright: Playwright, base_url: str, headless: bool = False) -> None:
+    def __init__(self, playwright: Playwright, base_url: str, headless: bool = False, device: str | None = None) -> None:
+        device_config = playwright.devices.get(device)
         self.browser = playwright.chromium.launch(headless=headless)
-        self.context = self.browser.new_context()
+        self.context = self.browser.new_context(**device_config)
         self.page = self.context.new_page()
         self.base_url = base_url
         self.test_cases = TestCases(self.page)
@@ -23,6 +25,15 @@ class App:
         self.page.fill("input[name=\"username\"]", login)
         self.page.fill("input[name=\"password\"]", password)
         self.page.press("input[name=\"password\"]", "Enter")
+
+    def click_menu_btn(self) -> None:
+        self.page.click(".menuBtn")
+
+    def is_menu_btn_visible(self) -> bool:
+        return self.page.is_visible(".menuBtn")
+
+    def get_location(self) -> str | None:
+        return self.page.text_content(".position")
 
     def close(self) -> None:
         self.page.close()
