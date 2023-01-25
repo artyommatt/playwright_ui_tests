@@ -6,7 +6,6 @@ from _pytest.fixtures import fixture
 from playwright.sync_api import sync_playwright, Playwright
 
 from page_object.application import App
-from settings import BROWSER_OPTIONS
 
 
 @fixture(scope="session")
@@ -18,7 +17,7 @@ def get_playwright() -> Generator[Playwright, None, None]:
 @fixture(scope="session")
 def desktop_app(get_playwright: Playwright, request: Any) -> Generator[App, None, None]:
     base_url = request.config.getoption("--base_url")
-    app = App(get_playwright, base_url=base_url, **BROWSER_OPTIONS)
+    app = App(get_playwright, base_url=base_url)
     app.goto('/')
     yield app
     app.close()
@@ -37,7 +36,7 @@ def desktop_app_auth(desktop_app: App, request: Any) -> Generator[App, None, Non
 def mobile_app(get_playwright: Playwright, request: Any) -> Generator[App, None, None]:
     base_url = request.config.getoption("--base_url")
     device = request.config.getoption("--device")
-    app = App(get_playwright, base_url=base_url, device=device, **BROWSER_OPTIONS)
+    app = App(get_playwright, base_url=base_url, device=device)
     app.goto('/')
     yield app
     app.close()
@@ -49,7 +48,7 @@ def mobile_app_auth(mobile_app: App, request: Any) -> Generator[App, None, None]
     config = load_config(secure)
     mobile_app.goto("/login")
     mobile_app.login(**config)
-    yield desktop_app
+    yield mobile_app
 
 
 def pytest_addoption(parser: Any) -> None:

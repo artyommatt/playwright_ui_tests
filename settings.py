@@ -1,4 +1,4 @@
-BROWSER_OPTIONS = {
-    "geolocation": {"latitude": 48.8, "longitude": 2.3},
-    "permissions": ["geolocation"],
-}
+# BROWSER_OPTIONS = {
+#     "geolocation": {"longitude": 48.8, "latitude": 2.3},
+#     "permissions": ["geolocation"]
+# }

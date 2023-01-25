@@ -4,12 +4,8 @@ from .test_cases import TestCases
 
 
 class App:
-    def __init__(self, playwright: Playwright, base_url: str, headless: bool = False, device: str | None = None, **kwargs) -> None:
+    def __init__(self, playwright: Playwright, base_url: str, headless: bool = False, device: str | None = None) -> None:
         device_config = playwright.devices.get(device)
-        if device_config:
-            device_config.update(kwargs)
-        else:
-            device_config = kwargs
         self.browser = playwright.chromium.launch(headless=headless)
         self.context = self.browser.new_context(**device_config)
         self.page = self.context.new_page()
