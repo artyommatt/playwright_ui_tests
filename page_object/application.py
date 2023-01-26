@@ -1,13 +1,14 @@
-from playwright.sync_api import Playwright
+from typing import Any
+
+from playwright.sync_api import Browser
 
 from .test_cases import TestCases
 
 
 class App:
-    def __init__(self, playwright: Playwright, base_url: str, headless: bool = False, device: str | None = None) -> None:
-        device_config = playwright.devices.get(device)
-        self.browser = playwright.chromium.launch(headless=headless)
-        self.context = self.browser.new_context(**device_config)
+    def __init__(self, browser: Browser, base_url: str, **kwargs: Any) -> None:
+        self.browser = browser
+        self.context = self.browser.new_context(**kwargs)
         self.page = self.context.new_page()
         self.base_url = base_url
         self.test_cases = TestCases(self.page)
@@ -20,6 +21,7 @@ class App:
 
     def navigate_to(self, menu: str) -> None:
         self.page.click(f"css=header >> text=\"{menu}\"")
+        self.page.wait_for_load_state()
 
     def login(self, login: str, password: str) -> None:
         self.page.fill("input[name=\"username\"]", login)
@@ -38,4 +40,3 @@ class App:
     def close(self) -> None:
         self.page.close()
         self.context.close()
-        self.browser.close()
