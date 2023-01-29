@@ -1,7 +1,8 @@
 from typing import Any
 
-from playwright.sync_api import Browser
+from playwright.sync_api import Browser, Route, Request
 
+from .dashboard import Dashboard
 from .demo_page import DemoPages
 from .test_cases import TestCases
 
@@ -14,6 +15,7 @@ class App:
         self.base_url = base_url
         self.test_cases = TestCases(self.page)
         self.demo_pages = DemoPages(self.page)
+        self.dashboard = Dashboard(self.page)
 
     def goto(self, endpoint: str, use_base_url: bool = True) -> None:
         if use_base_url:
@@ -38,6 +40,15 @@ class App:
 
     def get_location(self) -> str | None:
         return self.page.text_content(".position")
+
+    def intercept_request(self, url: str, payload: str) -> None:
+        def handler(route: Route, request: Request) -> None:
+            route.fulfill(status=200, body=payload)
+
+        self.page.route(url, handler)
+
+    def stop_interception(self, url: str) -> None:
+        self.page.unroute(url)
 
     def close(self) -> None:
         self.page.close()
