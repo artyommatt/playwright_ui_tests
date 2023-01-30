@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 from typing import Generator, Dict, Any
 
@@ -7,6 +8,13 @@ from _pytest.fixtures import fixture
 from playwright.sync_api import sync_playwright, Playwright, Browser
 
 from page_object.application import App
+
+
+@fixture(autouse=True, scope="session")
+def preconditions() -> Generator[Playwright, None, None]:
+    logging.info("preconditions started")
+    yield
+    logging.info("postconditions started")
 
 
 @fixture(scope="session")
