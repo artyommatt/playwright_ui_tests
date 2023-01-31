@@ -92,8 +92,8 @@ def desktop_app_bob(get_browser: Browser, request: Any) -> Generator[App, None, 
     secure = request.config.getoption("--secure")
     config = load_config(secure)
     app = App(get_browser, base_url=base_url)
-    desktop_app.goto("/login")
-    desktop_app.login(**config['users']['userRole2'])  # type: ignore
+    app.goto("/login")
+    app.login(**config['users']['userRole2'])  # type: ignore
     yield app
     app.close()
 
