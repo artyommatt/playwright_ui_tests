@@ -8,5 +8,8 @@ def test_dashboard(desktop_app_auth: App) -> None:
     desktop_app_auth.navigate_to("Dashboard")
     desktop_app_auth.intercept_request("**/getstat*", payload)
     desktop_app_auth.dashboard.refresh_dashboard()
-    assert desktop_app_auth.dashboard.get_total_tests_stat() == "0"
     desktop_app_auth.stop_interception("**/getstat*")
+    assert desktop_app_auth.dashboard.get_total_tests_stat() == "0"
+
+
+# def test_multiole_roles(desktop_app_auth: App, desktop_app_bob)

@@ -7,6 +7,7 @@ import pytest
 from _pytest.fixtures import fixture
 from playwright.sync_api import sync_playwright, Playwright, Browser
 
+from helpers.db import DataBase
 from helpers.web_service import WebService
 from page_object.application import App
 
@@ -24,9 +25,17 @@ def get_web_service(request: Any) -> Generator[WebService, None, None]:
     secure = request.config.getoption("--secure")
     config = load_config(secure)
     web = WebService(base_url)
-    web.login(**config)
+    web.login(**config['users']['userRole1'])  # type: ignore
     yield web
     web.close()
+
+
+@fixture(scope='session')
+def get_db(request: Any) -> Generator[DataBase, None, None]:
+    path = request.config.getoption('--db_path')
+    db = DataBase(path)
+    yield db
+    db.close()
 
 
 @fixture(scope="session")
@@ -73,8 +82,20 @@ def desktop_app_auth(desktop_app: App, request: Any) -> Generator[App, None, Non
     secure = request.config.getoption("--secure")
     config = load_config(secure)
     desktop_app.goto("/login")
-    desktop_app.login(**config)
+    desktop_app.login(**config['users']['userRole1'])  # type: ignore
     yield desktop_app
+
+
+@fixture(scope="session")
+def desktop_app_bob(get_browser: Browser, request: Any) -> Generator[App, None, None]:
+    base_url = request.config.getoption("--base_url")
+    secure = request.config.getoption("--secure")
+    config = load_config(secure)
+    app = App(get_browser, base_url=base_url)
+    desktop_app.goto("/login")
+    desktop_app.login(**config['users']['userRole2'])  # type: ignore
+    yield app
+    app.close()
 
 
 @fixture(scope="session", params=["iPhone 12", "Pixel 5"])
@@ -95,7 +116,7 @@ def mobile_app_auth(mobile_app: App, request: Any) -> Generator[App, None, None]
     secure = request.config.getoption("--secure")
     config = load_config(secure)
     mobile_app.goto("/login")
-    mobile_app.login(**config)
+    mobile_app.login(**config['users']['userRole1'])  # type: ignore
     yield mobile_app
 
 
@@ -105,6 +126,7 @@ def pytest_addoption(parser: Any) -> None:
     parser.addoption("--browser", action="store", default="chromium")
     parser.addoption("--base_url", action="store", default="http://127.0.0.1:8000")
     parser.addoption("--headless", action="store", help="run tests with headless", default="True")
+    parser.addoption("--db_path", action="store", help="path to sqlite db file", default="G:\\Work\\python\\Projects\\TestMe-TCM\\TestMe-TCM\\db.sqlite3")
 
 
 def load_config(config_file: str) -> Dict[str, str]:
